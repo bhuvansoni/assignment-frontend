@@ -1,0 +1,53 @@
+/* Table.css */
+
+.table-container {
+    top: 10px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 90%;
+    background-color: white;
+    
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+
+  .action-buttons {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .action-header {
+    text-align: center;
+  }
+  
+  .action-buttons div {
+    flex: 1; 
+  }
+
+  .actions{
+    display: flex;
+  }
+
+  button{
+    margin: 2px;
+  }
+
+  button:hover{
+    background-color: violet;
+  }
