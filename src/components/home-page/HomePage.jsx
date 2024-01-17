@@ -1,23 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./HomePage.css";
 import FormInput from "../commons/FormInput";
 import LayoutComponent from "../commons/LayoutComponent";
 import { Slide, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../commons/AuthProvider";
+import { createBooking, getCategories } from "../../utils/api";
 
 export default function HomePage() {
+  const { accessToken, email, name, setData } = useAuth();
+  const [categories, setCategories] = useState([]);
   const [values, setValues] = useState({
     email: "",
     title: "",
     startDate: getCurrentDateTime(),
     endDate: getCurrentDateTime(),
-    name: ""
+    name: "",
+    categoryId: "",
   });
 
   const inputs = [
     {
       id: 0,
-      name: "Name",
+      name: "name",
       type: "text",
       placeholder: "Name",
       label: "Name",
@@ -59,21 +64,89 @@ export default function HomePage() {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleCategoryChange = (e) => {
+    setValues({ ...values, categoryId: e.target.value });
+  };
+  useEffect(() => {
+    getCategories().then((response) => {
+      setCategories(response);
+    });
+    setValues({
+      ...values,
+      email: email || "",
+      name: name || "",
+    });
+  }, [email, name]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    console.log('test')
-    toast.success('Meeting Created!', {
-      position: "bottom-center",
-      autoClose: 15,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Slide,
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(values.email)) {
+      toast.error("Invalid email format", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
       });
+      return;
+    }
+
+    const startDate = new Date(values.startDate);
+    const endDate = new Date(values.endDate);
+
+    if (startDate >= endDate) {
+      toast.error("End date must be later than the start date", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
+      return;
+    }
+    const response = await createBooking(
+      values.title,
+      values.name,
+      values.email,
+      values.categoryId,
+      values.startDate,
+      values.endDate
+    );
+    if (response !== undefined) {
+      setData({
+        user_id: response,
+        name: values.name,
+        email: values.email,
+      });
+      setValues({
+        ...values,
+        title: "",
+        startDate: getCurrentDateTime(),
+        endDate: getCurrentDateTime(),
+      });
+      toast.success("Meeting Created!", {
+        position: "bottom-center",
+        autoClose: 15,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
+    }
   };
 
   function getCurrentDateTime() {
@@ -82,11 +155,24 @@ export default function HomePage() {
     return formattedDate;
   }
 
+  console.log(values);
   return (
     <LayoutComponent>
       <div className="create-meeting-form">
         <form onSubmit={handleSubmit}>
           <h1>Create Meeting</h1>
+          <select onChange={handleCategoryChange}>
+            <option value="" selected>
+              Select Category
+            </option>
+            {categories.map((value) => {
+              return (
+                <option key={value.category_id} value={value.category_id}>
+                  {value.category_name}
+                </option>
+              );
+            })}
+          </select>
           {inputs.map((input) => (
             <FormInput
               key={input.id}
@@ -102,7 +188,7 @@ export default function HomePage() {
           ))}
           <button>Submit</button>
         </form>
-        <ToastContainer/> 
+        <ToastContainer />
       </div>
     </LayoutComponent>
   );

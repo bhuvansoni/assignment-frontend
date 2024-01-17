@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import FormInput from "../commons/FormInput";
 import "./Login.css";
+import { login } from "../../utils/api";
+import { toast, ToastContainer, Slide } from "react-toastify";
+import { useAuth } from "../commons/AuthProvider";
+import Loader from "../commons/Loader";
+import { useNavigate } from "react-router-dom";
+
 export default function Login() {
+
+  const navigate = useNavigate();
   const [values, setValues] = useState({
     email: "",
     password: "",
   });
+  const {setData} = useAuth();
+
+  const [loading, setLoading] = useState(false);
 
   const inputs = [
     {
@@ -27,10 +38,37 @@ export default function Login() {
   const onChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-  console.log(values);
+
+  const submit = async (e) => {
+    setLoading(true);
+    e.preventDefault();
+    const response = await login(values.email, values.password);
+    if (response === undefined) {
+      toast.error("Invalid User Credentials", {
+        position: "bottom-center",
+        autoClose: 500,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
+    } else {
+      setData(response);
+      navigate("/")
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return <Loader/>;
+  }
   return (
     <div className="login-form">
-      <form action="">
+     
+      <form onSubmit={submit}>
         <h1>Login</h1>
 
         {inputs.map((input) => (
@@ -47,6 +85,7 @@ export default function Login() {
         ))}
         <button>Submit</button>
       </form>
+      <ToastContainer />
     </div>
   );
 }
