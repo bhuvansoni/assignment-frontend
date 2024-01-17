@@ -1,8 +1,8 @@
 import "./App.css";
 import Bookings from "./components/bookings/Bookings";
-import Header from "./components/header/Header";
 import HomePage from "./components/home-page/HomePage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Login from "./components/login/Login";
 
 const router = createBrowserRouter([
   {
@@ -12,6 +12,10 @@ const router = createBrowserRouter([
   {
     path: "/bookings",
     element: <Bookings/>
+  },
+  {
+    path: "/login",
+    element: <Login/>
   }
 ]);
 

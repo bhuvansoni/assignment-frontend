@@ -1,23 +1,22 @@
 import React, { useState } from "react";
-import "./HomePage.css";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 import FormInput from "../commons/FormInput";
-import LayoutComponent from "../commons/LayoutComponent";
-import { Slide, ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-export default function HomePage() {
+import "./EditBooking.css";
+export default function EditBooking({ onDelete, onClose, booking }) {
   const [values, setValues] = useState({
-    email: "",
-    title: "",
-    startDate: getCurrentDateTime(),
-    endDate: getCurrentDateTime(),
-    name: ""
+    email: booking.email,
+    title: booking.title,
+    startDate: booking.startDate,
+    endDate: booking.endDate,
+    name: booking.created_by
   });
+  console.log(values);
 
   const inputs = [
     {
       id: 0,
-      name: "Name",
+      name: "name",
       type: "text",
       placeholder: "Name",
       label: "Name",
@@ -61,19 +60,6 @@ export default function HomePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    console.log('test')
-    toast.success('Meeting Created!', {
-      position: "bottom-center",
-      autoClose: 15,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Slide,
-      });
   };
 
   function getCurrentDateTime() {
@@ -81,12 +67,11 @@ export default function HomePage() {
     const formattedDate = now.toISOString().slice(0, 16);
     return formattedDate;
   }
-
   return (
-    <LayoutComponent>
-      <div className="create-meeting-form">
-        <form onSubmit={handleSubmit}>
-          <h1>Create Meeting</h1>
+    <Popup open modal closeOnDocumentClick={false} className="popup-overlay">
+      <div className="modal">
+        <form className="edit-form" onSubmit={handleSubmit}>
+          <h1>Edit Booking</h1>
           {inputs.map((input) => (
             <FormInput
               key={input.id}
@@ -102,8 +87,7 @@ export default function HomePage() {
           ))}
           <button>Submit</button>
         </form>
-        <ToastContainer/> 
       </div>
-    </LayoutComponent>
+    </Popup>
   );
 }

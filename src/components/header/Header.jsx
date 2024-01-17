@@ -14,6 +14,7 @@ export default function Header() {
       <ul>
         <li onClick={() => handleItemClick("")}>Home</li>
         <li onClick={() => handleItemClick("bookings")}>Bookings</li>
+        <li onClick={() => handleItemClick("login")}>Are you a admin? Click Here!</li>
       </ul>
     </header>
   );
